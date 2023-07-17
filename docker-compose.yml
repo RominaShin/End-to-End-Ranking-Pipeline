@@ -1,0 +1,61 @@
+version: '3.11'
+services:
+  api:
+      build: src/api/
+      # image: src/api/
+        # context: .
+        # dockerfile: Dockerfile
+      container_name: api
+      # restart: unless-stopped
+      ports:
+        - 5000:5000
+      depends_on:
+        - mongodb_container
+        # - extractor
+        - model
+        # - provider
+      # environment:
+      #   - DB=mongodb://mongodb:27017
+      # tty: true
+
+  extractor:
+    build: src/extractor
+    # image: src/extractor
+    container_name: extractor
+    # ports:
+    #   - 
+    depends_on:
+      - mongodb_container
+
+  model:
+    build: src/model
+    container_name: model
+    # ports:
+    #   -
+    depends_on:
+      # - extractor
+      - mongodb_container
+      - provider
+
+  provider:
+    build: src/provider
+    container_name: provider
+    # ports:
+    #   -
+    depends_on:
+      - extractor
+      - mongodb_container
+
+  mongodb_container:
+    image: mongo:latest
+    container_name: mongodb_container
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - 27017:27017
+    # volumes:
+    #   - mongodb_data_container:/data/db
+
+# volumes:
+#   mongodb_data_container:
